@@ -8,4 +8,3 @@ Route::get('/', function () {
 });
 
 Route::get('/anime-quote', [AnimeQuoteController::class, 'getRandomQuote']);
-
