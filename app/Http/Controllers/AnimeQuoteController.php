@@ -2,33 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
+use App\Services\AnimeQuoteService;
+use Illuminate\Http\JsonResponse;
 
 class AnimeQuoteController extends Controller
 {
+    protected AnimeQuoteService $animeQuoteService;
+
+    public function __construct(AnimeQuoteService $animeQuoteService)
+    {
+        $this->animeQuoteService = $animeQuoteService;
+    }
+
     /**
-     * Fetch a random anime quote from AnimeChan API.
+     * Fetch a random anime quote using the AnimeQuoteService.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function getRandomQuote()
+    public function getRandomQuote(): JsonResponse
     {
         try {
-            $response = Http::get('https://api.animechan.io/v1/quotes/random');
+            $result = $this->animeQuoteService->getRandomQuote();
 
-            if ($response->successful()) {
-                return response()->json([
-                    'success' => true,
-                    'data' => $response->json(),
-                ]);
-            } else {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Failed to fetch anime quote.',
-                    'error' => $response->body(),
-                ], $response->status());
-            }
+            return response()->json($result, $result['success'] ? 200 : 400);
 
         } catch (\Exception $e) {
             return response()->json([
